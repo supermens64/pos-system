@@ -1,0 +1,81 @@
+const TOKEN = "123456";
+
+function doGet(e) {
+  if (e.parameter.token !== TOKEN) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ error: "Invalid token" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const action = e.parameter.action;
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  if (action === "products") {
+    const sheet = ss.getSheetByName("products");
+    const data = sheet.getDataRange().getValues();
+    const headers = data.shift();
+
+    const result = data.map(row => {
+      let obj = {};
+      headers.forEach((h, i) => obj[h] = row[i]);
+      return obj;
+    });
+
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === "sales") {
+    const sheet = ss.getSheetByName("sales");
+    const data = sheet.getDataRange().getValues();
+    const headers = data.shift();
+
+    const result = data.map(row => {
+      let obj = {};
+      headers.forEach((h, i) => obj[h] = row[i]);
+      return obj;
+    });
+
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ error: "Unknown action" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  const body = JSON.parse(e.postData.contents);
+
+  if (body.token !== TOKEN) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ error: "Invalid token" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("sales");
+
+  body.records.forEach(item => {
+    sheet.appendRow([
+      item.order_id,
+      item.datetime,
+      item.product,
+      item.quantity,
+      item.price,
+      item.cost,
+      item.total,
+      item.gross_profit,
+      item.payment_method,
+      item.paid_amount,
+      item.change_amount
+    ]);
+  });
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ success: true }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
