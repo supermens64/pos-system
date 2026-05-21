@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import requests
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 st.set_page_config(page_title="雲端 POS 系統", layout="wide")
 
@@ -135,8 +136,8 @@ if page == "點餐":
             can_checkout = paid_amount >= total_amount
 
             if st.button("結帳", type="primary", use_container_width=True, disabled=not can_checkout):
-                order_id = datetime.now().strftime("%Y%m%d%H%M%S")
-                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+               order_id = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d%H%M%S")
+               now = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d %H:%M:%S")
                 records = []
                 for product, item in st.session_state.cart.items():
                     quantity = int(item["quantity"])
@@ -197,7 +198,7 @@ elif page == "銷售統計":
             if col in sales.columns:
                 sales[col] = pd.to_numeric(sales[col], errors="coerce").fillna(0).astype(int)
 
-        selected_date = st.date_input("選擇日期", datetime.today())
+        selected_date = st.date_input("選擇日期", datetime.now(ZoneInfo("Asia/Taipei")).date())
         day_sales = sales[sales["datetime"].dt.date == selected_date]
 
         if len(day_sales) == 0:
@@ -226,3 +227,4 @@ elif page == "銷售統計":
 
             st.subheader("銷售明細")
             st.dataframe(day_sales.sort_values("datetime", ascending=False), use_container_width=True)
+                    
