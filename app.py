@@ -135,16 +135,20 @@ if page == "點餐":
 
             can_checkout = paid_amount >= total_amount
 
+            can_checkout = paid_amount >= total_amount
+
             if st.button("結帳", type="primary", use_container_width=True, disabled=not can_checkout):
-               order_id = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d%H%M%S")
-               now = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d %H:%M:%S")
+                order_id = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d%H%M%S")
+                now = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d %H:%M:%S")
                 records = []
+
                 for product, item in st.session_state.cart.items():
                     quantity = int(item["quantity"])
                     price = int(item["price"])
                     cost = int(item["cost"])
                     total = quantity * price
                     gross_profit = total - quantity * cost
+
                     records.append({
                         "order_id": order_id,
                         "datetime": now,
